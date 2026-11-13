@@ -19,10 +19,10 @@ GEMINI_API_KEY=your-api-key
 The CLI loads `.env` automatically. Exported environment variables take precedence.
 The `.env` file is ignored by Git.
 
-The default model is `gemini-flash-latest`. Override it with `-model`:
+The default model is `gemini-3.5-flash`. Override it with `-model`:
 
 ```sh
-go run cmd/main.go -p "Hello" -model gemini-flash-latest
+go run cmd/main.go -p "Hello" -model gemini-3.5-flash-lite
 ```
 
 Uses the [Gemini generateContent REST API](https://ai.google.dev/api/generate-content).
