@@ -11,6 +11,7 @@ import (
 )
 
 func GetAiResponse(prompt string, model string) error {
+	var usage *genai.GenerateContentResponseUsageMetadata
 	apiKey := config.GetConfig().ApiKey
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
@@ -23,7 +24,7 @@ func GetAiResponse(prompt string, model string) error {
 	if len(model) > 0 {
 		modelName = fmt.Sprintf("models/%s", model)
 	}
-	for res, err := range client.Models.GenerateContentStream(
+	for chunk, err := range client.Models.GenerateContentStream(
 		ctx,
 		modelName,
 		genai.Text(prompt),
@@ -32,9 +33,24 @@ func GetAiResponse(prompt string, model string) error {
 		if err != nil {
 			return err
 		}
-		if res != nil {
-			fmt.Print(res.Text())
+		if chunk == nil {
+			continue
 		}
+
+		fmt.Print(chunk.Text())
+		if chunk.UsageMetadata != nil {
+			usage = chunk.UsageMetadata
+		}
+	}
+	fmt.Println()
+	if usage != nil {
+		fmt.Printf(
+			"input_tokens=%d output_tokens=%d thought_tokens=%d total_tokens=%d",
+			usage.PromptTokenCount,
+			usage.CandidatesTokenCount,
+			usage.ThoughtsTokenCount,
+			usage.TotalTokenCount,
+		)
 	}
 	return nil
 }
